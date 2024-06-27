@@ -1,0 +1,8 @@
+# Provided files for the project
+package.json
+.eslintrc.js
+babel.config.js
+
+# Files from `npm install`
+/node_modules
+package-lock.json
