@@ -13,23 +13,22 @@ class UsersController {
       return res.status(400).send({ error: 'Missing password' });
     }
 
-    try {
-      const emailExists = await dbClient.usercollection.findOne({ email });
-      if (emailExists) {
-        return res.status(400).send({ error: 'Already exist' });
-      }
+    const secretPassword = sha1(password);
+    const insertStat = await dbClient.users.insertOne({
+      email,
+      password: secretPassword,
+    });
 
-      const hashedPassword = sha1(password);
-      const newUser = {
-        email,
-        password: hashedPassword,
-      };
+    const createdUser = {
+      id: insertStat.insertedId,
+      email,
+    };
 
-      const result = await dbClient.usercollection.insertOne(newUser);
-      return res.status(201).send({ id: result.insertedId, email });
-    } catch (error) {
-      return res.status(500).send({ error: 'Error creating user' });
-    }
+    await userQ.add({
+      userId: insertStat.insertedId.toString(),
+    });
+
+    return res.status(201).send(createdUser);
   }
 }
 
