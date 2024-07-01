@@ -8,19 +8,19 @@ const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = null
-    this.connect()
+    this.client = null;
+    this.connect();
   }
 
   async connect() {
     try {
-        const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-        this.client = client.db(DB_DATABASE);
-        this.usercollection = this.client.collection('users');
-        this.filecollection = this.client.collection('files');
-      } catch (err) {
-        console.error('Error connecting to MongoDB:', err);
-      }
+      const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+      this.client = client.db(DB_DATABASE);
+      this.usercollection = this.client.collection('users');
+      this.filecollection = this.client.collection('files');
+    } catch (err) {
+      console.error('Error connecting to MongoDB:', err);
+    }
   }
 
   isAlive() {
