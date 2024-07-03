@@ -3,6 +3,11 @@ const { promisify } = require('util');
 
 class RedisClient {
   constructor() {
+    this.client = null;
+    this.connect();
+  }
+
+  connect() {
     // Creates a client which listens on local host by default
     // with the port 6379
     this.client = redis.createClient();
@@ -16,7 +21,7 @@ class RedisClient {
   }
 
   isAlive() {
-    return this.client.connected;
+    return this.clinet !== null;
   }
 
   async get(key) {
