@@ -38,6 +38,11 @@ class DBClient {
     if (!this.filecollection) return 0;
     return this.filecollection.countDocuments();
   }
+
+  async insertFile(file) {
+    const result = await this.client.collection('files').insertOne(file);
+    return result.ops[0];
+  }
 }
 
 const dbClient = new DBClient();
