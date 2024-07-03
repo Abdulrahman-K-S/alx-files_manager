@@ -43,6 +43,14 @@ class DBClient {
     const result = await this.client.collection('files').insertOne(file);
     return result.ops[0];
   }
+
+  async findFilesByUserAndParentId(userId, parentId, page, pageSize) {
+    return await this.client.collection('files')
+      .find({ userId, parentId })
+      .skip(page * pageSize)
+      .limit(pageSize)
+      .toArray();
+  }
 }
 
 const dbClient = new DBClient();
