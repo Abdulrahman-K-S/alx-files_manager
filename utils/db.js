@@ -1,5 +1,4 @@
-const { MongoClient } = require('mongodb');
-const process = require('process');
+import { MongoClient } from 'mongodb';
 
 const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_PORT = process.env.DB_PORT || 27017;
@@ -8,50 +7,33 @@ const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = null;
-    this.connect();
-  }
-
-  async connect() {
-    try {
-      const client = await MongoClient.connect(url, {
-        useNewUrlParser: true, useUnifiedTopology: true,
-      });
-      this.client = client.db(DB_DATABASE);
-      this.usercollection = this.client.collection('users');
-      this.filecollection = this.client.collection('files');
-    } catch (err) {
-      console.error('Error connecting to MongoDB:', err);
-    }
+    MongoClient.connect(url, { useUnifiedTopology: true }, (error, client) => {
+      if (!error) {
+        this.db = client.db(DB_DATABASE);
+        this.users = this.db.collection('users');
+        this.files = this.db.collection('files');
+      } else {
+        console.log(error.message);
+        this.db = false;
+      }
+    });
   }
 
   isAlive() {
-    return this.client !== null;
+    return !!this.db;
   }
 
   async nbUsers() {
-    if (!this.usercollection) return 0;
-    return this.usercollection.countDocuments();
+    const userCount = this.users.countDocuments();
+    return userCount;
   }
 
   async nbFiles() {
-    if (!this.filecollection) return 0;
-    return this.filecollection.countDocuments();
-  }
-
-  async insertFile(file) {
-    const result = await this.client.collection('files').insertOne(file);
-    return result.ops[0];
-  }
-
-  async findFilesByUserAndParentId(userId, parentId, page, pageSize) {
-    return await this.client.collection('files')
-      .find({ userId, parentId })
-      .skip(page * pageSize)
-      .limit(pageSize)
-      .toArray();
+    const fileCount = this.files.countDocuments();
+    return fileCount;
   }
 }
 
 const dbClient = new DBClient();
-module.exports = dbClient;
+
+export default dbClient;

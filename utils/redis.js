@@ -3,25 +3,17 @@ const { promisify } = require('util');
 
 class RedisClient {
   constructor() {
-    this.client = null;
-    this.connect();
-  }
-
-  connect() {
-    // Creates a client which listens on local host by default
-    // with the port 6379
     this.client = redis.createClient();
 
     this.getAsync = promisify(this.client.get).bind(this.client);
 
-    // Executes when there's an error in the conection
-    this.client.on('error', (err) => {
-      console.log(`Redis client not connected to the server: ${err.message}`);
+    this.client.on('error', (error) => {
+      console.log(`Redis client not connected to the server: ${error.message}`);
     });
   }
 
   isAlive() {
-    return this.clinet !== null;
+    return this.client.connected;
   }
 
   async get(key) {
@@ -38,4 +30,5 @@ class RedisClient {
 }
 
 const redisClient = new RedisClient();
-module.exports = redisClient;
+
+export default redisClient;
