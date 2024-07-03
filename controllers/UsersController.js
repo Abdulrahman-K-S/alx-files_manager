@@ -21,7 +21,7 @@ class UsersController {
     const hashedPassword = sha1(password);
     const newUser = {
       email,
-      password: hashedPassword
+      password: hashedPassword,
     };
 
     try {
